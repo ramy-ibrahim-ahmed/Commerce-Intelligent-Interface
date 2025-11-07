@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Syara Chatbot UI</title>
+    <!-- Pixel/arcade fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #04040a;
+            --panel: #0b0b17;
+            --neon-1: #39ff14;
+            --neon-2: #00e5ff;
+            --accent: #ff3b8a;
+            --text: #e6f0ff;
+            --muted: #9aa7b7;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: 'VT323', monospace;
+            background: radial-gradient(circle at 10% 10%, rgba(0, 30, 60, 0.12), transparent 5%),
+                linear-gradient(180deg, #000013 0%, #04040a 70%);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .arcade-shell {
+            width: 100%;
+            height: 100%;
+            border-radius: 18px;
+            background: linear-gradient(180deg, #081223 0%, #03030a 100%);
+            box-shadow: 0 18px 40px rgba(2, 6, 16, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 1fr;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .side {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.02));
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Press Start 2P', monospace;
+            letter-spacing: 2px;
+            font-size: 12px;
+            color: var(--neon-2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo .dot {
+            width: 10px;
+            height: 10px;
+            background: var(--neon-1);
+            border-radius: 2px;
+            box-shadow: 0 0 8px var(--neon-1)
+        }
+
+        .bots-list {
+            flex: 1;
+            overflow: auto;
+            padding: 6px;
+            border-radius: 8px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.2), transparent);
+            touch-action: pan-y;
+            overscroll-behavior: contain;
+        }
+
+        .bots-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .bots-list::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .bots-list::-webkit-scrollbar-thumb {
+            background: rgba(57, 255, 20, 0.3);
+            border-radius: 4px;
+        }
+
+        .bots-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(57, 255, 20, 0.5);
+        }
+
+        .bot-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            transition: transform .12s ease, box-shadow .12s ease;
+        }
+
+        .bot-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6)
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--neon-2), var(--neon-1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700
+        }
+
+        .bot-name {
+            font-size: 11px;
+            color: var(--text)
+        }
+
+        .bot-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        .side-controls {
+            display: flex;
+            gap: 8px
+        }
+
+        .btn {
+            font-family: 'Press Start 2P';
+            font-size: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: var(--glass);
+            color: var(--text);
+            outline: none
+        }
+
+        .btn--neon {
+            box-shadow: 0 0 10px rgba(0, 229, 255, 0.12), inset 0 -6px 30px rgba(0, 229, 255, 0.02);
+            border: 1px solid rgba(0, 229, 255, 0.18)
+        }
+
+        .panel {
+            border-radius: 14px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            background: linear-gradient(180deg, rgba(10, 16, 32, 0.5), rgba(3, 3, 8, 0.6));
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            overflow: hidden;
+        }
+
+        .screen-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .title {
+            font-family: 'Press Start 2P';
+            font-size: 12px;
+            color: var(--neon-1)
+        }
+
+        .status {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .chat-window {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.02));
+            position: relative;
+            touch-action: pan-y;
+            overscroll-behavior: contain;
+            min-height: 0;
+        }
+
+        .chat-window::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .chat-window::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            margin: 4px 0;
+        }
+
+        .chat-window::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--neon-1), var(--neon-2));
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.3);
+        }
+
+        .chat-window::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #4aff2e, #14f0ff);
+            box-shadow: 0 0 15px rgba(57, 255, 20, 0.6);
+        }
+
+        .chat-window::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+            background-size: 100% 3px;
+            mix-blend-mode: overlay;
+            opacity: 0.25
+        }
+
+        .messages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .msg {
+            max-width: 72%;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            line-height: 1.25;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .msg.user {
+            align-self: flex-end;
+            background: linear-gradient(180deg, rgba(255, 59, 138, 0.08), rgba(255, 59, 138, 0.03));
+            border: 1px solid rgba(255, 59, 138, 0.12);
+        }
+
+        .msg.bot {
+            align-self: flex-start;
+            background: linear-gradient(180deg, rgba(0, 229, 255, 0.06), rgba(0, 229, 255, 0.02));
+            border: 1px solid rgba(0, 229, 255, 0.14)
+        }
+
+        .msg .meta {
+            font-family: 'Press Start 2P';
+            font-size: 9px;
+            color: var(--muted);
+            margin-bottom: 6px
+        }
+
+        .typing {
+            display: inline-flex;
+            gap: 6px;
+            align-items: center
+        }
+
+        .dot-anim {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--muted);
+            opacity: 0.85;
+            animation: blink 1s infinite
+        }
+
+        .dot-anim:nth-child(2) {
+            animation-delay: 0.12s
+        }
+
+        .dot-anim:nth-child(3) {
+            animation-delay: 0.24s
+        }
+
+        @keyframes blink {
+            0% {
+                transform: translateY(0);
+                opacity: 0.25
+            }
+
+            50% {
+                transform: translateY(-5px);
+                opacity: 1
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 0.25
+            }
+        }
+
+        .input-container {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 4px;
+        }
+
+        .composer {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .input {
+            flex: 1;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            background: rgba(0, 0, 0, 0.25);
+            font-size: 16px;
+            color: var(--text);
+            outline: none
+        }
+
+        .send {
+            width: 84px;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Press Start 2P';
+            font-size: 11px;
+            cursor: pointer;
+            background: linear-gradient(180deg, var(--neon-1), var(--neon-2));
+            color: #001;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 26px rgba(57, 255, 20, 0.09)
+        }
+
+        .footer {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .small {
+            font-size: 10px
+        }
+
+        @media (max-width:880px) {
+            .arcade-shell {
+                grid-template-columns: 1fr;
+                height: 100vh
+            }
+
+            .side {
+                order: 2;
+                display: flex;
+                flex-direction: row;
+                overflow: auto;
+                touch-action: pan-x;
+                overscroll-behavior: contain;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="arcade-shell">
+        <aside class="side">
+            <div class="logo"><span class="dot"></span><span>SYARA</span></div>
+            <div class="bots-list" id="botsList">
+                <div class="bot-item" data-id="default">
+                    <div class="avatar">SY</div>
+                    <div>
+                        <div class="bot-name">Syara</div>
+                        <div class="bot-sub">Your Car Dream Marketer</div>
+                    </div>
+                </div>
+            </div>
+            <div class="side-controls">
+                <button class="btn btn--neon" id="btnClear">CLEAR</button>
+                <button class="btn" id="btnDemo">DEMO</button>
+            </div>
+            <div style="height:6px"></div>
+            <div class="small">Tip: Press <strong>Enter</strong> to send. Describe your dream car and let Syara guide
+                you.</div>
+        </aside>
+        <section class="panel">
+            <div class="screen-top">
+                <div class="title">SYARA CHAT — CAR DREAM MODE</div>
+                <div class="status" id="status">status: disconnected</div>
+            </div>
+            <div class="chat-window" id="chatWindow" role="log" aria-live="polite">
+                <div class="messages" id="messages">
+                    <!-- messages appear here -->
+                </div>
+            </div>
+            <div class="input-container">
+                <div class="composer">
+                    <input class="input" id="inputBox" placeholder="Describe your dream car..."
+                        aria-label="Message input">
+                    <button class="btn btn--neon" id="micBtn"
+                        style="width:84px; font-size:11px; padding:12px;">MIC</button>
+                    <button class="send" id="sendBtn">SEND</button>
+                </div>
+                <div class="footer">
+                    <div class="small">Model: <span id="modelLabel">syara-v1</span></div>
+                    <div style="flex:1"></div>
+                    <div class="small">v0.1.0</div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script>
+        const messagesEl = document.getElementById('messages');
+        const inputBox = document.getElementById('inputBox');
+        const sendBtn = document.getElementById('sendBtn');
+        const statusEl = document.getElementById('status');
+        const btnClear = document.getElementById('btnClear');
+        const btnDemo = document.getElementById('btnDemo');
+        const chatWindow = document.getElementById('chatWindow');
+        const micBtn = document.getElementById('micBtn');
+        let recorder;
+        let stream;
+        function appendMessage(text, who = 'bot', meta = '') {
+            const el = document.createElement('div');
+            el.className = 'msg ' + (who === 'user' ? 'user' : 'bot');
+            if (meta) el.innerHTML = `<div class="meta">${meta}</div>` + wrapText(text);
+            else el.innerHTML = wrapText(text);
+            const wasAtBottom = chatWindow.scrollTop + chatWindow.clientHeight >= chatWindow.scrollHeight - 1;
+            messagesEl.appendChild(el);
+            if (wasAtBottom) {
+                setTimeout(() => {
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                }, 0);
+            }
+            if (who === 'bot') {
+                // TTS call
+                fetch('/api/v1/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                }).then(res => {
+                    if (!res.ok) throw new Error('TTS API error');
+                    return res.blob();
+                }).then(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const audio = new Audio(url);
+                    audio.play().catch(e => console.error('Audio play error:', e));
+                }).catch(e => {
+                    console.error('TTS error:', e);
+                    // Optionally append a message about TTS failure
+                });
+            }
+        }
+        function wrapText(text) {
+            return `<div style=\"font-family:VT323,monospace;white-space:pre-wrap;\">${escapeHtml(text)}</div>`;
+        }
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        function showTyping() {
+            const el = document.createElement('div');
+            el.className = 'msg bot';
+            el.id = 'typingIndicator';
+            el.innerHTML = `<div class="meta">Syara</div><div class="typing"><span class="dot-anim"></span><span class="dot-anim"></span><span class="dot-anim"></span></div>`;
+            const wasAtBottom = chatWindow.scrollTop + chatWindow.clientHeight >= chatWindow.scrollHeight - 1;
+            messagesEl.appendChild(el);
+            if (wasAtBottom) {
+                setTimeout(() => {
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                }, 0);
+            }
+        }
+        function hideTyping() {
+            const t = document.getElementById('typingIndicator');
+            if (t) {
+                const wasAtBottom = chatWindow.scrollTop + chatWindow.clientHeight >= chatWindow.scrollHeight - 1;
+                t.remove();
+                if (wasAtBottom) {
+                    setTimeout(() => {
+                        chatWindow.scrollTop = chatWindow.scrollHeight;
+                    }, 0);
+                }
+            }
+        }
+        async function sendToBackend(userText) {
+            statusEl.textContent = 'status: thinking...';
+            showTyping();
+            try {
+                const response = await fetch('/api/v1/bestfit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_message: userText })
+                });
+                if (!response.ok) throw new Error('API error');
+                const data = await response.json();
+                hideTyping();
+                appendMessage(data.response, 'bot', 'Syara');
+                statusEl.textContent = 'status: connected';
+            } catch (error) {
+                hideTyping();
+                appendMessage('Error: ' + error.message, 'bot', 'System');
+                statusEl.textContent = 'status: error';
+            }
+        }
+        function send() {
+            const text = inputBox.value.trim();
+            if (!text) return;
+            appendMessage(text, 'user', 'You');
+            inputBox.value = '';
+            sendToBackend(text);
+        }
+        sendBtn.addEventListener('click', send);
+        inputBox.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+        });
+        btnClear.addEventListener('click', () => { messagesEl.innerHTML = ''; statusEl.textContent = 'status: disconnected'; });
+        btnDemo.addEventListener('click', () => {
+            appendMessage('Boot sequence initiated...', 'bot', 'System');
+            setTimeout(() => appendMessage('Welcome to Syara — describe your dream car to begin.', 'bot', 'Syara'), 600);
+            statusEl.textContent = 'status: connected';
+        });
+        micBtn.addEventListener('click', async () => {
+            if (!recorder) {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    recorder = new MediaRecorder(stream, { mimeType: 'audio/ogg;codecs=opus' });
+                    let chunks = [];
+                    recorder.ondataavailable = e => chunks.push(e.data);
+                    recorder.onstop = async () => {
+                        const blob = new Blob(chunks, { type: 'audio/webm' });
+                        chunks = [];
+                        const formData = new FormData();
+                        formData.append('file', blob, 'voice.ogg');
+                        statusEl.textContent = 'status: transcribing...';
+                        try {
+                            const res = await fetch('/api/v1/stt', {
+                                method: 'POST',
+                                body: formData
+                            });
+                            if (!res.ok) throw new Error('STT API error');
+                            const data = await res.json();
+                            inputBox.value = data.text;
+                            // Optionally auto-send: send();
+                        } catch (error) {
+                            console.error('STT error:', error);
+                            appendMessage('STT Error: ' + error.message, 'bot', 'System');
+                        }
+                        statusEl.textContent = 'status: connected';
+                    };
+                    recorder.start();
+                    micBtn.textContent = 'STOP';
+                    micBtn.style.background = 'linear-gradient(180deg, var(--accent), var(--neon-1))';
+                } catch (e) {
+                    console.error('Mic access error:', e);
+                    appendMessage('Mic access denied.', 'bot', 'System');
+                }
+            } else {
+                recorder.stop();
+                recorder = null;
+                stream.getTracks().forEach(track => track.stop());
+                micBtn.textContent = 'MIC';
+                micBtn.style.background = '';
+            }
+        });
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                appendMessage('Initializing car dream matrix...', 'bot', 'System');
+                setTimeout(() => appendMessage('Syara online. Tell me about your dream car!', 'bot', 'Syara'), 800);
+                statusEl.textContent = 'status: connected';
+            }, 300);
+        });
+        document.querySelector('.panel').addEventListener('click', (e) => {
+            if (!e.target.closest('.chat-window')) {
+                inputBox.focus();
+            }
+        });
+    </script>
+</body>
+
+</html>
