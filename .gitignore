@@ -8,3 +8,6 @@ wheels/
 
 # Virtual environments
 .venv
+assets/postgres_data
+assets/qdrant_data
+server/alembic
