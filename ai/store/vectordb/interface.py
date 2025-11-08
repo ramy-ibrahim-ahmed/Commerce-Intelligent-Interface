@@ -22,7 +22,7 @@ class BaseVectorDB(ABC):
 
     @abstractmethod
     def semantic_search(
-        self, collection_name: str, vector: list[float], top_k: int
+        self, collection_name: str, vectors: list[float], top_k: int
     ) -> list[dict]: ...
 
     @abstractmethod

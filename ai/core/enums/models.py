@@ -19,3 +19,4 @@ class ModelSize(Enum):
 class TaskModelConfig:
     BESTFIT_QUERY: ModelSize = ModelSize.SMALL
     BESTFIT_RESPOND: ModelSize = ModelSize.SMALL
+    BESTFIT_DESCRIPE: ModelSize = ModelSize.SMALL

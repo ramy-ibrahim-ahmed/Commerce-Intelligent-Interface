@@ -11,3 +11,5 @@ wheels/
 assets/postgres_data
 assets/qdrant_data
 server/alembic
+design/Untitled Diagram.drawio
+design/.$Untitled Diagram.drawio.bkp

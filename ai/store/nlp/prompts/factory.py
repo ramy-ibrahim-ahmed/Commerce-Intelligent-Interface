@@ -11,9 +11,12 @@ class PromptFactory:
         self.prompts = {
             "query_write": self._load_prompt,
             "recommend": self._load_prompt,
+            "descripe": self._load_prompt,
         }
 
-    def get_prompt(self, prompt_type: Literal["query_write", "recommend"]) -> str:
+    def get_prompt(
+        self, prompt_type: Literal["query_write", "recommend", "descripe"]
+    ) -> str:
         if prompt_type not in self.prompts:
             raise ValueError(f"Invalid prompt type: {prompt_type}")
         return self.prompts[prompt_type](prompt_type)

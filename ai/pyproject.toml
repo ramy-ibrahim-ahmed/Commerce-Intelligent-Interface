@@ -13,6 +13,7 @@ dependencies = [
     "pandas>=2.3.3",
     "pydantic-settings>=2.11.0",
     "python-multipart>=0.0.20",
+    "qdrant-client>=1.15.1",
     "structlog>=25.5.0",
     "uvicorn[standard]>=0.38.0",
 ]
